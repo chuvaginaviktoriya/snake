@@ -14,26 +14,44 @@ const getHeadByKey = (state) => {
 }
 
 const isKeyValid = (state, key) => {
-  if ((state.key === 'ArrowDown' && key !== 'ArrowUp') ||
-      (state.key === 'ArrowLeft' && key !== 'ArrowRight') ||
-      (state.key === 'ArrowUp' && key !== 'ArrowDown') ||
-      (state.key === 'ArrowRight' && key !== 'ArrowLeft')
-  ) {
-    return true
+  if (['ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'].indexOf(key) === -1) {
+    return false
   }
-  return false
+
+  if ((state.key === 'ArrowDown' && key === 'ArrowUp') ||
+      (state.key === 'ArrowLeft' && key === 'ArrowRight') ||
+      (state.key === 'ArrowUp' && key === 'ArrowDown') ||
+      (state.key === 'ArrowRight' && key === 'ArrowLeft')
+  ) {
+    return false
+  }
+  return true
+}
+
+const inBodyCoord = (state, head) => {
+  return (state.snakeBody.some(item => item.x === head.x && item.y === head.y))
+}
+
+const isWall = (state, head) => {
+  return (head.y >= state.width || head.x >= state.height || head.x < 0 || head.y < 0)
 }
 
 export default {
   NEXT_STEP (state) {
     const head = getHeadByKey(state)
+    if (inBodyCoord(state, head) || isWall(state, head)) {
+      state.gameOver = true
+      return
+    }
     state.snakeBody.push(head)
     if (head.x !== state.food.x || head.y !== state.food.y) {
       state.snakeBody.shift()
     } else {
+      state.speed > 30 && (state.speed -= state.speedIncrease)
+      state.points += state.pointIncrease
       state.food = {
-        x: Math.round(Math.random() * 100) * 10,
-        y: Math.round(Math.random() * 100) * 10
+        x: Math.round(Math.random() * 75) * 10,
+        y: Math.round(Math.random() * 55) * 10
       }
     }
   },

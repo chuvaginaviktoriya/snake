@@ -1,18 +1,17 @@
 export default {
   snakeBody: [
-    { x: 0, y: 10 },
-    { x: 0, y: 20 },
-    { x: 0, y: 30 },
-    { x: 0, y: 40 },
-    { x: 0, y: 50 },
-    { x: 0, y: 60 },
-    { x: 0, y: 70 }
+    { x: 0, y: 0 }
   ],
   key: 'ArrowRight',
-  step: 10,
+  width: 600,
+  height: 800,
+  speedIncrease: 5,
   speed: 100,
+  points: 0,
+  pointIncrease: 10,
   food: {
-    x: Math.round(Math.random() * 100) * 10,
-    y: Math.round(Math.random() * 100) * 10
-  }
+    x: Math.round(Math.random() * 75) * 10,
+    y: Math.round(Math.random() * 55) * 10
+  },
+  gameOver: false
 }
