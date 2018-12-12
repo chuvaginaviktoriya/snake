@@ -1,41 +1,34 @@
 <template>
   <div id="app">
-     <div class="snake-points">
-      {{ points }}
-    </div>
-    <div class="switcher">
-      <img :src="im" @click="click">
-    </div>
-    <div class="snake-field">
-      <div
-        class='snake'
-        v-for="(coord, index) in snakeBody" 
-        :key="index" 
-        :style="getStyle(coord)"
-        ></div>
-        <div class='food' :style="getStyle(food)"></div>
-    </div>
-   
+    <info
+      :points="points"
+      :black="black"
+      :pause="pause"
+      @paused="paused"
+      @click="click"
+    ></info>
+    <snake
+      :food="food"
+      :snake-body="snakeBody"
+    ></snake>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex'
+import Info from './components/Info.vue'
+import Snake from './components/Snake.vue'
 
 export default {
   name: 'app',
   data: () => ({
-    timer: null,
-    black: false
+    pause: false,
+    black: false,
+    key: null
   }),
-  watch: {
-    speed(value) {
-      clearInterval(this.timer);
-      this.timer = setInterval(() => {
-        this.$store.commit('NEXT_STEP')
-        this.gameOver && clearInterval(this.timer);
-      }, value * 10)
-    }
+  components: {
+    Info,
+    Snake
   },
   computed: {
     ...mapGetters([
@@ -47,82 +40,50 @@ export default {
       'points',
       'gameOver'
     ]),
-    im() {
-      return (this.black) ? require('./assets/white.png') : require('./assets/dark.png')
-    }
   },
-  mounted() {
+  mounted () {
     const field = this.$el.querySelector('.snake-field');
     field && (field.style.width = `${this.width}px`);
     field && (field.style.height = `${this.height}px`);
     window.addEventListener('keydown', (event) => this.down(event))
+    setTimeout(this.step,  this.speed)
   },
-  beforeDestroy() {
+  beforeDestroy () {
   	window.removeEventListener('keydown', (event) => this.down(event))
   },
   methods: {
-    getStyle(coord) {
-      return `top: ${coord.x}px; left: ${coord.y}px`
+    down (event) {
+      !this.pause && (this.key = event.code)
     },
-    down(event) {
-      !this.gameOver && this.$store.commit('SET_KEY', event.code)
+    paused () {
+      this.pause = !this.pause
+      !this.pause && setTimeout(this.step, this.speed)
     },
-    click() {
+    click () {
       this.black = !this.black
       const body = document.querySelector('body')
-      const points = document.querySelector('.snake-points')
+      const points = document.querySelector('.info__points')
       body.style.background = (this.black) ? '#000' : '#fff'
       points.style.color = (this.black) ? 'rgba(255, 255, 255, 0.5)' : '#000'
+    },
+    step () {
+      if (this.gameOver) {
+        return
+      }
+      this.$store.commit('SET_KEY', this.key)
+      this.$store.commit('NEXT_STEP')
+      !this.pause && setTimeout(this.step, this.speed)
     }
-  },
-  // eslint-disable-next-line
-  created() {
-    const self = this
-    const myFunction = function() {
-        self.$store.commit('NEXT_STEP')
-        this.gameOver && clearInterval(self.timer)
-        setTimeout(myFunction,  self.speed)
-    }
-    setTimeout(myFunction,  this.speed)
-  },
+  }
 }
 </script>
 
 <style lang="sass">
 @keyframes resize
-  to
-    transform: scale(0.8) 
   from
+    transform: scale(0.5)
+  to
     transform: scale(1)
 #app
-  display: flex
-  align-items: center
-  flex-direction: column
-  .switcher
-    img
-      width: 50px
-      height: 50px
-      position: absolute
-      right: 50px
-      background: transparent
-    &:hover
-      cursor: pointer
-  .snake
-    &-points
-      margin: 20px 0
-      font-size: 20px
-      color: #000
-    &-field
-      border: 5px groove #1E90FF
-      position: relative
-      .snake,
-      .food
-        position: absolute
-        height: 10px
-        width: 10px
-      .snake
-        background: burlywood
-      .food
-        animation: resize 1s infinite;
-        background: green
+  padding-top: 50px
 </style>
