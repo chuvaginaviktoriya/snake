@@ -1,13 +1,15 @@
 
-import { createApp } from './main'
+import { createApp } from './app'
 
 export default context => {
   return new Promise((resolve, reject) => {
-    const { app, router } = createApp()
+    const { app, router, store } = createApp()
 
-    router.push(context.url)
+    const { url } = context
+    router.push(url)
 
     router.onReady(() => {
+      context.state = store.state
       resolve(app)
     }, reject)
   })

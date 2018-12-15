@@ -31,6 +31,7 @@
         this.$emit('click')
       },
       paused () {
+        console.log("paused")
         this.$emit('paused')
       }
     }
