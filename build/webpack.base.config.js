@@ -5,6 +5,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = {
+  mode: isProd ? 'production' : 'development',
   devtool: isProd
     ? false
     : '#cheap-module-source-map',
@@ -34,10 +35,10 @@ module.exports = {
       },
       {
         test: /\.(scss|sass)$/,
-        use: ExtractTextPlugin.extract({
+        use: (isProd) ? ExtractTextPlugin.extract({
           use: ['css-loader', 'sass-loader?indentedSyntax'],
           fallback: 'vue-style-loader'
-        })
+        }) : ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax']
       }
     ]
   },
@@ -49,6 +50,7 @@ module.exports = {
       })
     ]
     : [
+      new VueLoaderPlugin(),
       new FriendlyErrorsPlugin()
     ]
 }

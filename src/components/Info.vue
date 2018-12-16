@@ -7,6 +7,9 @@
     <div class="info__switcher">
       <img :src="switcher" @click="click">
     </div>
+    <div class="info__end-game" @click="goHome">
+      <div class="info__end-game-cross"></div>
+    </div>
   </div>
 </template>
 
@@ -24,15 +27,17 @@
       },
       player () {
         return (this.pause) ? require('../assets/play.png') : require('../assets/pause.png')
-      }
+      },
     },
     methods: {
       click () {
         this.$emit('click')
       },
       paused () {
-        console.log("paused")
         this.$emit('paused')
+      },
+      goHome () {
+       this.$emit('goHome')
       }
     }
   }
@@ -46,7 +51,8 @@
   width: 400px
   margin: auto
   &__switcher,
-  &__player
+  &__player,
+  &__end-game
     img
       width: 50px
       height: 50px
@@ -55,4 +61,21 @@
   &__points
     font-size: 20px
     color: #000
+  &__end-game
+    width: 50px
+    &-cross
+      background: #CD6D45
+      height: 50px 
+      width: 10px
+      position: relative
+      left: 20px
+      transform: rotate(45deg)
+      &:after 
+        content: ""
+        height: 10px; 
+        width: 50px
+        background: #CD6D45
+        position: absolute
+        left: -20px
+        top: 20px
 </style>

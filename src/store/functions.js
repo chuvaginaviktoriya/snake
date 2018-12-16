@@ -38,7 +38,6 @@ const isWall = (state, head) => {
 
 const isGameOver = (state, head) => {
   if (inBodyCoord(state, head) || isWall(state, head)) {
-    console.log('DEAD')
     state.gameOver = true
     return true
   }

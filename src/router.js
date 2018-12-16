@@ -6,6 +6,9 @@ Vue.use(Router)
 export function createRouter () {
   return new Router({
     mode: 'history',
-    routes: []
+    routes: [
+      { path: '/', component: () => import('./components/Main.vue') },
+      { path: '/snake/', component: () => import('./components/Game.vue') }
+    ]
   })
 }

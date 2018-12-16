@@ -30,5 +30,15 @@ export default {
       return
     }
     state.key = key
+  },
+
+  CLEAR (state) {
+    state.snakeBody = [
+      { x: 0, y: 0 }
+    ]
+    state.speed = 100
+    state.points = 0
+    state.gameOver = false
+    state.key = 'ArrowRight'
   }
 }

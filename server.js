@@ -3,8 +3,8 @@
 const express = require('express')
 const server = express()
 const fs = require('fs')
-const clientManifest = require('./dist/vue-ssr-client-manifest.json')
 const { createBundleRenderer } = require('vue-server-renderer')
+const isProd = process.env.NODE_ENV === 'production'
 
 function createRenderer (bundle, options) {
   return createBundleRenderer(bundle, Object.assign(options, {
@@ -13,16 +13,25 @@ function createRenderer (bundle, options) {
 }
 
 let renderer
-server.get('/', (req, res) => {
-  const context = {
-    title: 'Vue JS - Server Render',
-    url: req.url
-  }
+let readyPromise
+
+if (isProd) {
   const bundle = require('./dist/vue-ssr-server-bundle.json')
+  const clientManifest = require('./dist/vue-ssr-client-manifest.json')
   renderer = createRenderer(bundle, {
     clientManifest
   })
+} else {
+  readyPromise = require('./build/setup-dev-server')(server, (bundle, options) => {
+    renderer = createRenderer(bundle, options)
+  })
+}
 
+function render (req, res) {
+  const context = {
+    title: 'Vue HN 2.0', // default title
+    url: req.url
+  }
   renderer.renderToString(context, function (err, html) {
     if (err) {
       if (err.code === 404) {
@@ -34,7 +43,11 @@ server.get('/', (req, res) => {
       res.end(html)
     }
   })
+}
+server.use('/dist', express.static('dist'))
+
+server.get('*', isProd ? render : (req, res) => {
+  readyPromise.then(() => render(req, res))
 })
 
-server.use('/dist', express.static('dist'))
-server.listen(3000)
+server.listen(8080)

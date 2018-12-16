@@ -4,13 +4,6 @@ import { sync } from 'vuex-router-sync'
 import { createStore } from './store'
 import { createRouter } from './router'
 
-// Vue.config.productionTip = false
-
-// new Vue({
-//   store,
-//   render: h => h(App)
-// }).$mount('#app')
-
 export function createApp () {
   const router = createRouter()
   const store = createStore()
